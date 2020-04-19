@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -44,6 +45,9 @@ namespace XmlDocMarkdown.Core
 
 		private IEnumerable<NamedText> DoGenerateOutput(Assembly assembly, XmlDocAssembly xmlDocAssembly)
 		{
+			var dependencyResolver = new AssemblyDependencyResolver(assembly);
+			AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => dependencyResolver.TryResolve(args.Name);
+
 			string extension = GetFileExtension();
 			string assemblyName = assembly.GetName().Name;
 			string assemblyFilePath = assembly.Modules.FirstOrDefault()?.FullyQualifiedName;
